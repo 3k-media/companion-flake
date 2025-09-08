@@ -10,7 +10,7 @@
       imports = [
         flake-parts.flakeModules.easyOverlay
       ];
-      systems = ["x86_64-linux"];
+      systems = ["x86_64-linux" "aarch64 "];
       perSystem = { system, config, pkgs, lib, ... }:
       {
         overlayAttrs = {
@@ -25,7 +25,9 @@
               installPhase = ''
                 runHook preInstall
                 mkdir -p $out
-                cp -r node_modules companion shared-lib webui BUILD SENTRY $out
+                cp -r node_modules companion shared-lib webui $out
+                echo "${finalAttrs.version}" > $out/BUILD
+                echo > $out/SENTRY
                 runHook postInstall
               '';
 
@@ -48,7 +50,7 @@
               offlineCache = pkgs.yarn-berry_4.fetchYarnBerryDeps {
                 inherit (finalAttrs) src patches;
                 missingHashes = ./missing-hashes.json;
-                hash = "sha256-VXCy6Oc0YjnkNl1mSrwQvbe9K2R9o4qv70hjauxgJEU=";
+                hash = "sha256-gvZYdZbk/aUli+1Fn1Axsj0bCIyMh5l7TPFdGttpxSc=";
               };
             };
           in
@@ -59,8 +61,7 @@
             owner = "bitfocus";
             repo = "companion";
             rev = "v${finalAttrs.version}";
-            hash = "sha256-3enM8255+mWyz7IZwwrSGHVRFnU1iIs2r5pxjqvH0vw=";
-            leaveDotGit = true;
+            hash = "sha256-qe5PfiPgRuvua7FqM7rvmmPruHxbpHCR3iJ+NeXfr5Q=";
           };
 
           patches = [
@@ -84,7 +85,7 @@
 
           configurePhase = ''
             runHook preConfigure
-            cp -r ${patched_node_modules}/{node_modules,BUILD,SENTRY} .
+            cp -r ${patched_node_modules}/{node_modules,SENTRY,BUILD} .
             runHook postConfigure
           '';
 
